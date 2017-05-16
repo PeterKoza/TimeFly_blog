@@ -3,10 +3,10 @@
 		<div v-if="visible">
 				<form v-on:submit.prevent="singin">
 						<i class="fa fa-times" aria-hidden="true" v-on:click="hideLogin()"></i>
-						<label for="bookTitle">Name:</label>
-						<input type="text" id="bookTitle" class="form control" v-model="member.name" required><br>
-						<label for="bookTitle">password:</label>
-						<input type="text" id="bookTitle" class="form control" v-model="member.password" required><br>
+						<label for="login_name">Name:</label>
+						<input type="text" id="login_name" class="form control" v-model="member.name" required><br>
+						<label for="login_password">password:</label>
+						<input type="text" id="login_password" class="form control" v-model="member.password" required><br>
 						<input type="submit" class="btn btn-success" value="login">
 				</form>
 			</div>
@@ -71,16 +71,17 @@ export default {
 <style scoped>
 
 form {
-  position: fixed;
-  top: 30%;
-  left: 50%;
-  -ms-transform: translate(-50%, 0); /* IE 9 */
-  -webkit-transform: translate(-50%, 0); /* Safari */
-  transform: translate(-50%, 0);
-  color: black;
+  	position: fixed;
+  	top: 30%;
+  	left: 50%;
+  	-ms-transform: translate(-50%, 0); /* IE 9 */
+  	-webkit-transform: translate(-50%, 0); /* Safari */
+  	transform: translate(-50%, 0);
+  	color: black;
 	background-color: white;
 	border: 1px solid gray;
 	padding: 10%;
+	z-index: 2;
 }
 
 i {

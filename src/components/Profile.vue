@@ -114,6 +114,8 @@ form {
     background-color: white;
     border: 1px solid gray;
     padding: 10%;
+    height: 90%;
+    overflow: scroll;
 }
 
 img {

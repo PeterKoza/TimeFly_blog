@@ -7,6 +7,8 @@ import Blog from '@/components/Blog'
 import Article from '@/components/Article'
 import NewArticle from '@/components/NewArticle'
 
+import VueRouterTransition from 'vue-router-transition'
+
 Vue.use(Router)
 
 export default new Router({

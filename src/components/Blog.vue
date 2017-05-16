@@ -5,17 +5,20 @@
         <router-link v-if="isAdmin" to="/new_article"><button type="button" class="btn btn-success">+ Add new article</button></router-link>
         <div class="row">
             <div v-for="article in articles" class="col-lg-3 col-sm-4 center">
-                <img :id="article.img" v-bind:src="getImage(article.img)" class="defaultArticleImg" alt="article image">
-                <h4>{{ article.title }}</h4>
-                <p>{{ article.text.slice(0, 250) }}
                 <router-link :to="{ name: 'article', params: { articleKey: article['.key'] }}">
-                <b v-if="isAdmin">
-                    <button type="button">Edit</button>
-                </b>
-                <b v-else>
-                    [...]
-                </b>
-                </router-link></p>
+                <img :id="article.img" v-bind:src="getImage(article.img)" class="defaultArticleImg" alt="article image">
+                </router-link>
+                <h4>{{ article.title }}</h4>
+                <div><vue-markdown class="chunk">{{ article.text.slice(0, 250) }}</vue-markdown>
+                    <router-link :to="{ name: 'article', params: { articleKey: article['.key'] }}">
+                    <b v-if="isAdmin">
+                        <button type="button">Edit</button>
+                    </b>
+                    <b v-else>
+                        [...]
+                    </b>
+                    </router-link>
+                </div>
                 <span v-if="isAdmin" class="glyphicon glyphicon-trash" v-on:click="removeArticle(article)"></span>
             </div>
         </div>
@@ -28,6 +31,8 @@
 import { db, storage } from './../FirebaseDB'
 import toastr from 'toastr'
 import { mapGetters } from 'vuex'
+
+import VueMarkdown from 'vue-markdown'
 
 const articlesRef = db.ref('articles')
 const storageRef = storage.ref('articles');
@@ -63,6 +68,10 @@ export default {
         return {
             img: require('../assets/Logo_Green.png')
         }
+    },
+
+    components: {
+        'vue-markdown': VueMarkdown
     }
 }
 
@@ -81,5 +90,14 @@ span {
     align-items: center;
     justify-content: center;
     font-weight: bold;
+}
+
+.center{
+    margin-bottom: 35px;
+}
+
+.chunk{
+    max-height: 8em;
+    overflow: hidden;
 }
 </style>

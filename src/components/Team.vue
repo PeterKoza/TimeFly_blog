@@ -10,18 +10,18 @@
             <div class="panel-body">
             <form id="form" class="form-line" v-on:submit.prevent="addAuthor">
                 <div class="form-group">
-                <label for="bookTitle">Name:</label>
-                <input type="text" id="bookTitle" class="form control" v-model="newAuthor.name" required>
+                <label for="name">Name:</label>
+                <input type="text" id="name" class="form control" v-model="newAuthor.name" required>
                 </div>
 
                 <div class="form-group">
-                <label for="bookTitle">Department:</label>
-                <input type="text" id="bookTitle" class="form control" v-model="newAuthor.department" required>
+                <label for="department">Department:</label>
+                <input type="text" id="department" class="form control" v-model="newAuthor.department" required>
                 </div>
 
                 <div>
-                <label for="bookTitle">Password:</label>
-                <input type="text" id="bookTitle" class="form control" v-model="newAuthor.password" required>
+                <label for="password">Password:</label>
+                <input type="text" id="password" class="form control" v-model="newAuthor.password" required>
                 </div>
                 <input type="submit" class="btn btn-primary" value="Add author">
             </form>
@@ -30,7 +30,7 @@
 
         <div class="row">
             <div v-for="author in authors" class="col-lg-4 col-sm-6 center">
-                <img :id="author.img" :src="getImage(author.img)" alt="profile image"> 
+                <img :id="author.img" :src="getImage(author.img)" alt="profile picture"> 
                 <h2>{{author.name}}</h2>
                 <h3>{{author.department}}</h3>
                     
@@ -116,7 +116,7 @@ export default {
 
 <style scoped>
 
-a{
+a {
   color: gray;
 }
 
@@ -144,6 +144,10 @@ h2 {
 h3 {
   margin: 0;
   font-size: 1.1em;
+}
+
+img {
+  border-radius: 100px;
 }
 
 </style>

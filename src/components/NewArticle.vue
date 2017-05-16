@@ -1,26 +1,36 @@
 <template>
     <div id="new_article">
-    <section>
+    <router-link to="/blog"><button type="button">
+        <i class="fa fa-arrow-circle-left" aria-hidden="true"></i>Back</button>
+    </router-link>
+    <section v-if="isAdmin">
         <h1>Create new article</h1>
         <form v-on:submit.prevent="uploadArticle">
             <label for="bookTitle">Tilte:</label>
             <input type="text" id="bookTitle" class="form control" v-model="newArticle.title" required>
             <img :src="viewImage" />
             <input type="file" id="file" @change="onFileChange">
-            <textarea
-            rows="30" cols="80" v-model="newArticle.text" required> {{ newArticle.text }} </textarea >
+            <markdown-editor v-model="newArticle.text" ref="markdownEditor"></markdown-editor>
             <input type="submit" class="btn btn-success" value="upload article">
         </form>
+    </section>
+    <section v-else>
+        <h1>permission denied</h1>
     </section>
     </div>
 </template>
 
 <script>
+import Vue from 'vue'
 import toastr from 'toastr'
 
 import { db, storage } from './../FirebaseDB'
 
 import { mapGetters, mapActions } from 'vuex'
+
+import VueSimplemde from 'vue-simplemde'
+Vue.use(VueSimplemde)
+import { markdownEditor } from 'vue-simplemde'
 
 const articlesRef = db.ref('articles')
 const storageRef = storage.ref('articles');
@@ -73,6 +83,10 @@ export default {
             image: new Image(),
             viewImage: require('./../assets/Logo_Green.png')
         }
+    },
+
+    components: {
+        markdownEditor
     }
 }
 </script>
@@ -80,5 +94,11 @@ export default {
 
 
 <style scoped>
+
+button{
+    margin-left: 5%;
+    margin-top: 10px;
+    font-size: 1.5em;
+}
 
 </style>

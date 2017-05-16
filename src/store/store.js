@@ -92,6 +92,13 @@ const mutations = {
         if (article.img.length > 4) {
             storage.ref('articles').child(article.img).put(image, { contentType: 'image/jpeg' })
         }
+    },
+
+    addComent (state, playload) {
+        const coment = playload.coment
+        const articleKey = playload.articleKey
+        const articleComentsRef = db.ref('articles/' + articleKey + '/coments')
+        articleComentsRef.push(coment)
     }
 
 }
@@ -104,6 +111,7 @@ const actions = {
     uploadArticle: (context, playload) => context.commit('uploadArticle', playload),
     setArticle: (context, playload) => context.commit('setArticle', playload),
     saveArticle: (context, playload) => context.commit('saveArticle', playload),
+    addComent: (context, playload) => context.commit('addComent', playload),
 
     saveProfile: (context, palyload) => context.commit('saveProfile', palyload)
 }

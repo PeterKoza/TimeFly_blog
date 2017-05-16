@@ -1,11 +1,14 @@
 <template>
     <div id="article">
+    <router-link to="/blog"><button type="button">
+        <i class="fa fa-arrow-circle-left" aria-hidden="true"></i>Back</button>
+    </router-link>
     <section>
         <div v-if="!isAdmin">
             <h1>{{ currentArticle.title }}</h1>
             <h2>Posted on <em>{{ currentArticle.date }}</em>, by <em>{{ currentArticle.author }}</em></h2>
-            <img :id="currentArticle.img" :src="getImage(currentArticle.img)" alt="article image">
-            <p>{{ currentArticle.text }}</p>
+            <img class="overflow" :id="currentArticle.img" :src="getImage(currentArticle.img)" alt="article image">
+            <vue-markdown>{{ currentArticle.text }}</vue-markdown>
         </div>
         <div v-else>
             <form v-on:submit.prevent="saveArticle">
@@ -13,21 +16,50 @@
                 <input type="text" id="bookTitle" class="form control" v-model="currentArticle.title" required>
                 <img :id="currentArticle.img" :src="getImage(currentArticle.img)" alt="article image">
                 <input type="file" id="file" @change="onFileChange">
-                <textarea rows="30" cols="80" v-model="currentArticle.text" required> {{ currentArticle.text }} </textarea >
+                <markdown-editor v-model="currentArticle.text" ref="markdownEditor"></markdown-editor>
                 <input type="submit" class="btn btn-success" value="save article">
-            </form>
+            </form> 
         </div>
+
+        <h2>Leave a Reply</h2>
+        <form v-on:submit.prevent="sendComent">
+            <markdown-editor v-model="coment.response" ref="markdownEditor"></markdown-editor>
+            <label for="name">your name:</label>
+            <input type="text" id="name" class="form control" v-model="coment.visitor" required>
+            <br>
+            <label for="mail">e-mail:</label>
+            <input type="text" id="mail" class="form control" v-model="coment.mail" required>
+            <br>
+            <input type="submit" class="btn btn-success" value="POST COMENT">
+        </form>
+        <div v-for="coment in reverse(currentArticle.coments)">
+            <h3><i class="fa fa-comment"></i> {{ coment.visitor }} <em v-if="isAdmin">{{ coment.mail }}</em>:
+                <small>{{ coment.date }}</small>
+            </h3>
+            <vue-markdown>{{ coment.response }}</vue-markdown>
+        </div>
+
     </section>
     </div>
 </template>
-
+ 
 <script>
+import Vue from 'vue' 
 import { db, storage } from './../FirebaseDB'
 import Firebase from 'firebase'
 
 import { mapGetters, mapActions } from 'vuex'
 
-const articlesRef = db.ref('articles')
+import _ from 'lodash'
+import toastr from 'toastr'
+import VueSimplemde from 'vue-simplemde'
+import VueMarkdown from 'vue-markdown'
+
+Vue.use(VueSimplemde)
+
+import { markdownEditor } from 'vue-simplemde'
+
+const articlesRef = db.ref('articles') 
 const storageRef = storage.ref('articles');
 
 export default {
@@ -41,9 +73,8 @@ export default {
     methods: {
         ...mapActions(['setArticle']),  
         getImage: function (img) {
-            console.log(this.imageName)
-            console.log(this.currentArticle.img)
-            if (this.imageName === '' && this.currentArticle.img.length > 4) {
+            if (this.imageName === '' && this.currentArticle.img.length > 4 && !this.updated) {
+                this.updated = true
                 const starsRef = storageRef.child(img);
                 starsRef.getDownloadURL().then(function(url) {
                     document.getElementById(img).src = url;
@@ -57,7 +88,7 @@ export default {
 
         onFileChange(e) {
         const files = e.target.files || e.dataTransfer.files;
-        if (!files.length)
+        if (!files)
             return;
         this.createImage(files[0]);
         },
@@ -71,19 +102,56 @@ export default {
             reader.readAsDataURL(file);
         },
         saveArticle: function () {
-            this.currentArticle.img = this.imageName
+            if (this.imageName) {
+                this.currentArticle.img = this.imageName
+            }
             const playload = {article: this.currentArticle, image: this.image}
             this.$store.dispatch('saveArticle', playload)
-
+        },
+        sendComent: function () {
+            const date = new Date()
+            this.coment.date = date.getDate() + '/' + (date.getMonth()+1) + '/' + date.getFullYear()
+            const playload = {coment: this.coment, articleKey: this.$route.params.articleKey} 
+            this.$store.dispatch('addComent', playload)
+            this.coment.visitor = ""
+            this.coment.mail = ""
+            this.coment.response = ""
+            toastr.success('The comment has been successfully uploaded')
+        },
+        reverse: function (array) {
+            console.log(_.sortBy(array, "key").reverse())
+            return _.sortBy(array, "key").reverse()
         }
     },
 
     data () {
         return {
             imageName: '',
-            article: this.$store.dispatch('setArticle', {articleKey: this.$route.params.articleKey}),
             viewImage: require('./../assets/Logo_Green.png'),
+            updated: false,
+            coment: {
+                visitor: "",
+                mail: "",
+                response: "",
+                date: ""
+            }
         }
+    },
+
+    created () {
+        this.$store.dispatch('setArticle', {articleKey: this.$route.params.articleKey})
+    },
+
+    filters: {
+        reverse: function (array) {
+            console.log(array)
+            return array.slice().reverse()
+        }
+    },
+
+    components: {
+        markdownEditor,
+        'vue-markdown': VueMarkdown
     }
 }
 
@@ -96,11 +164,21 @@ h1 {
 }
 
 img {
-    float: left;
     margin: 0 1.2em 0.5em 0;
 }
 
-p {
-    white-space: pre-line;
+overflow {
+    float: left;
 }
+
+.markdown-editor{
+    position: relative;
+}
+
+button{
+    margin-left: 5%;
+    margin-top: 10px;
+    font-size: 1.5em;
+}
+
 </style>
